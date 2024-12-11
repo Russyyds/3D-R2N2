@@ -1,0 +1,2 @@
+Total loss: 0.086662
+Total mAP: 0.805445
