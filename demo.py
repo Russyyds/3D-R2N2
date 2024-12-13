@@ -38,30 +38,36 @@ def download_model(fn):
 def load_demo_images():
     ims = []
     for i in range(3):
-        im = Image.open('test_imgs/%d.jpg' % i)
+        im = Image.open('test_imgs3/%d.jpg' % i)
         im = np.array(im).transpose(
             (2, 0, 1)).astype(np.float32) / 255.
         im_shape = im.shape
         if im_shape[0] > 3 and im.shape[1] > 127:
             im = im[1:, :127, :127]
-        # TODO 长宽不一致的图像需要letterbox
-        if im_shape[0] == 3 and im_shape[1] > 127:
+        # TODO 长宽不一致的图像需要letterbox缩放到127*127
+        if im_shape[0] == 3 and (im_shape[1] > 127 or im_shape[2] > 127):
             # im = im[:, :127, :127]
             min_value = min(im_shape[1], im_shape[2])
             scale = min_value / 127
-            print(scale)
+            print("Scale:", scale)
             if scale > 0:
                 # im = im.resize((int(im_shape[1] / scale), int(im_shape[2] / scale)))
-                new_width = int(im_shape[1] / scale)
-                new_height = int(im_shape[2] / scale)
-                print(new_height)
-                print(new_width)
-                print(im.shape)
+                new_height = int((im_shape[1] + scale - 1) / scale)
+                new_width = int((im_shape[2] + scale - 1) / scale)
                 im = cv2.resize(im.transpose(1, 2, 0), (new_width, new_height)).transpose(2, 0, 1)
+                # 根据长边和短边来缩放图像
+                # 高 > 宽
+                if new_height > new_width:
+                    diff = int((new_height - new_width + 1) / 2)
+                    im = im[:, diff:diff+127, :]
+                # 高 < 宽
+                else:
+                    diff = int((new_width - new_height + 1) / 2)
+                    im = im[:, :, diff:diff+127]
         tmp_im = im.transpose(1, 2, 0) * 255
         tmp_im = Image.fromarray(tmp_im.astype(np.uint8))
-        tmp_im.save('test_imgs/%d_.png' % i)
-        print(np.array(im).shape)
+        tmp_im.save('test_imgs/%d_saved.png' % i)
+        print("Input img shape:", np.array(im).shape)
         ims.append([im])
     return np.array(ims)
 

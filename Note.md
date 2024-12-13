@@ -1,7 +1,7 @@
 
 
 # 依赖
-本代码使用VSCode测试
+本代码使用VSCode测试，anaconda管理python环境
 
 ## 安装Meshlab（可选）
 用于可视化.obj文件
@@ -14,18 +14,8 @@
 ## 安装python及依赖
 安装python3.5版本，这个项目年份较早，且使用的是theano(已经停止维护)，所以不能用太新的python版本。
 ```bash
-conda create -n py35 python=3.5
-conda activate py35
-```
-pip安装依赖库
-```bash
-pip install -r requiremenets.txt
-```
-用conda安装这几个额外的依赖
-```bash
-conda install m2w64-toolchain # 用于编译theano
-
-conda install pygpu # GPU
+conda env create -n py35 -f .\environment.yaml  # 创建python3.5环境
+conda activate py35  # 激活python3.5环境
 ```
 
 拷贝.theanorc到${HOME}/.theanorc
@@ -55,3 +45,19 @@ python demo.py prediction.obj
 测试结果
 
 ![精度](./imgs/inferennce_result.png)
+
+结果存储在 精度.txt和output/default/test路径下
+
+# 常见错误
+
+执行demo.py时，报错：
+```bash
+NameError: ('The following error happened while compiling the node', forall_inplace,cpu,scan_fn}(Shape_i{0}.0, Subtensor{int64:int64:int8}.0, IncSubtensor{InplaceSet;:int64:}.0, IncSubtensor{InplaceSet;:int64:}.0, <TensorType(float32, 4D)>, <TensorType(float32, 4D)>, <TensorType(float32, 4D)>, <TensorType(float32, 4D)>, <TensorType(float32, 4D)>, <TensorType(float32, 4D)>, <TensorType(float32, 4D)>, <TensorType(float32, 4D)>, <TensorType(float32, 4D)>, <TensorType(float32, 4D)>, <TensorType(float32, 4D)>, <TensorType(float32, 4D)>, <TensorType(float32, 4D)>, <TensorType(float32, 4D)>, <TensorType(float32, 4D)>, <TensorType(float32, matrix)>, <TensorType(float32, matrix)>, <TensorType(float32, matrix)>, <TensorType(float32, matrix)>, InplaceDimShuffle{x,x,0,x,x}.0, InplaceDimShuffle{x,0}.0, InplaceDimShuffle{x,0,x,x}.0, InplaceDimShuffle{x,0,x,x}.0, InplaceDimShuffle{x,0,x,x}.0, InplaceDimShuffle{x,0,x,x}.0, InplaceDimShuffle{x,0,x,x}.0, InplaceDimShuffle{x,0,x,x}.0, InplaceDimShuffle{x,0,x,x}.0, InplaceDimShuffle{x,0,x,x}.0, InplaceDimShuffle{x,0,x,x}.0, InplaceDimShuffle{x,0,x,x}.0, InplaceDimShuffle{x,0,x,x}.0, InplaceDimShuffle{x,0,x,x}.0, InplaceDimShuffle{x,0,x,x}.0, InplaceDimShuffle{x,0,x,x}.0, InplaceDimShuffle{x,0,x,x}.0, InplaceDimShuffle{x,x,0,x,x}.0, InplaceDimShuffle{x,x,0,x,x}.0, Shape_i{4}.0, Shape_i{3}.0, Shape_i{1}.0, Shape_i{0}.0, Shape_i{4}.0, Shape_i{3}.0, Shape_i{1}.0, Shape_i{0}.0, Shape_i{4}.0, Shape_i{3}.0, Shape_i{1}.0, Shape_i{0}.0, Reshape{4}.0, Reshape{4}.0, Reshape{4}.0), '\n', "name 'CVM' is not defined")
+```
+尝试下面语句清除theano缓存
+```bash
+theano-cache purge
+```
+
+如果还出现theano问题，删除这个路径下的Theano文件夹再试
+![清除缓存](./imgs/clear_theano.png)
